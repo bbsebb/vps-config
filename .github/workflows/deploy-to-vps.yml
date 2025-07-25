@@ -35,15 +35,15 @@ jobs:
           scp -r nginx/sites-available/* ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }}:~/temp_nginx_config/
           
           # Use sudo to create directories and move files to their final locations
-          ssh ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }} "sudo mkdir -p /etc/nginx/sites-available /etc/nginx/sites-enabled"
-          ssh ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }} "sudo cp ~/temp_nginx_config/nginx.conf /etc/nginx/"
-          ssh ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }} "sudo cp ~/temp_nginx_config/* /etc/nginx/sites-available/"
+          ssh ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }} "echo '${{ secrets.VPS_USER_PASSWORD }}' | sudo -S mkdir -p /etc/nginx/sites-available /etc/nginx/sites-enabled"
+          ssh ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }} "echo '${{ secrets.VPS_USER_PASSWORD }}' | sudo -S cp ~/temp_nginx_config/nginx.conf /etc/nginx/"
+          ssh ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }} "echo '${{ secrets.VPS_USER_PASSWORD }}' | sudo -S cp ~/temp_nginx_config/* /etc/nginx/sites-available/"
           
           # Create symbolic links for enabled sites (if they don't exist)
           ssh ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }} "for site in /etc/nginx/sites-available/*; do \
             site_name=\$(basename \$site); \
             if [ ! -L /etc/nginx/sites-enabled/\$site_name ]; then \
-              sudo ln -sf /etc/nginx/sites-available/\$site_name /etc/nginx/sites-enabled/\$site_name; \
+              echo '${{ secrets.VPS_USER_PASSWORD }}' | sudo -S ln -sf /etc/nginx/sites-available/\$site_name /etc/nginx/sites-enabled/\$site_name; \
             fi \
           done"
           
@@ -53,5 +53,5 @@ jobs:
       - name: Test Nginx configuration and reload
         run: |
           echo "Testing Nginx configuration..."
-          ssh ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }} "sudo nginx -t && sudo systemctl reload nginx"
+          ssh ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }} "echo '${{ secrets.VPS_USER_PASSWORD }}' | sudo -S nginx -t && echo '${{ secrets.VPS_USER_PASSWORD }}' | sudo -S systemctl reload nginx"
           echo "Configuration deployed and Nginx reloaded successfully!"
