@@ -26,10 +26,11 @@ The repository includes a GitHub Actions workflow that automatically deploys con
 The workflow requires the following GitHub secrets and variables to be set up:
 
 - **Secret**: `VPS_SSH_KEY` - The private SSH key for connecting to your VPS
+- **Secret**: `VPS_USER_PASSWORD` - The sudo password for the VPS user
 - **Variable**: `VPS_HOST` - The hostname or IP address of your VPS
 - **Variable**: `VPS_USERNAME` - The username for SSH connection to your VPS
 
-**Important**: The user specified in `VPS_USERNAME` must have sudo privileges on the VPS to modify Nginx configuration files in system directories.
+**Important**: The user specified in `VPS_USERNAME` must have sudo privileges on the VPS to modify Nginx configuration files in system directories. The `VPS_USER_PASSWORD` is used to execute sudo commands on the VPS.
 
 ### Setting Up GitHub Secrets and Variables
 
@@ -52,20 +53,27 @@ If the deployment fails, check the following:
 
 1. Verify that all required secrets and variables are correctly set up in GitHub
 2. Ensure the SSH key has the necessary permissions on the VPS
-3. Confirm that the VPS user has sudo privileges and can execute commands without password prompts
-4. Check that the paths in the workflow file match the actual paths on your VPS
-5. Review the GitHub Actions logs for specific error messages
+3. Confirm that the VPS user has sudo privileges
+4. Verify that the VPS_USER_PASSWORD is correct if sudo requires a password
+5. Check that the paths in the workflow file match the actual paths on your VPS
+6. Review the GitHub Actions logs for specific error messages
 
-If you see "Permission denied" errors, it's likely that the VPS user doesn't have sudo access or the sudo configuration requires a password.
+### Common Errors
+
+- **"Permission denied" errors**: The VPS user doesn't have sudo access or the file permissions are too restrictive.
+- **"a terminal is required to read the password"**: This occurs when sudo requires a password but can't prompt for it in a non-interactive session. The workflow now uses `echo '${{ secrets.VPS_USER_PASSWORD }}' | sudo -S` to provide the password via standard input.
+- **"a password is required"**: The sudo password is incorrect or not provided. Verify that the VPS_USER_PASSWORD secret is set correctly in GitHub.
 
 ## Security Considerations
 
 - The SSH key should have the minimum necessary permissions on the VPS
 - Consider using a dedicated user for deployments
-- Configure sudo access for the deployment user with the minimum necessary permissions
-- Use `/etc/sudoers.d/` to grant specific sudo permissions without requiring a password:
+- Storing the sudo password in GitHub Secrets is convenient but has security implications
+- For enhanced security, configure sudo access for the deployment user with NOPASSWD for specific commands:
   ```
   # Example sudoers file for nginx deployments
   deployuser ALL=(ALL) NOPASSWD: /bin/mkdir -p /etc/nginx/*, /bin/cp * /etc/nginx/*, /bin/ln -sf /etc/nginx/*, /usr/sbin/nginx -t, /bin/systemctl reload nginx
   ```
-- Regularly rotate SSH keys for enhanced security
+- If you use the NOPASSWD approach above, you can remove the VPS_USER_PASSWORD secret and modify the workflow to not use the `-S` option with sudo
+- Regularly rotate SSH keys and passwords for enhanced security
+- Consider using a password manager or secrets vault for managing sensitive credentials
