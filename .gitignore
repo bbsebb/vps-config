@@ -47,6 +47,5 @@ build/
 target/
 
 # System files
-.DS_Store
 .directory
 .Trash-*
