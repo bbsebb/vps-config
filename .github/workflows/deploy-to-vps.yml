@@ -27,25 +27,28 @@ jobs:
         run: |
           echo "Deploying configuration to VPS..."
           
-          # Create remote directory structure if it doesn't exist
-          ssh ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }} "mkdir -p /etc/nginx/sites-available"
+          # Create a temporary directory on the VPS
+          ssh ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }} "mkdir -p ~/temp_nginx_config"
           
-          # Copy Nginx main configuration
-          scp nginx/nginx.conf ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }}:/etc/nginx/
+          # Copy Nginx configurations to the temporary directory
+          scp nginx/nginx.conf ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }}:~/temp_nginx_config/
+          scp -r nginx/sites-available/* ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }}:~/temp_nginx_config/
           
-          # Copy site configurations
-          scp -r nginx/sites-available/* ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }}:/etc/nginx/sites-available/
-          
-          # Ensure sites-enabled directory exists
-          ssh ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }} "mkdir -p /etc/nginx/sites-enabled"
+          # Use sudo to create directories and move files to their final locations
+          ssh ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }} "sudo mkdir -p /etc/nginx/sites-available /etc/nginx/sites-enabled"
+          ssh ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }} "sudo cp ~/temp_nginx_config/nginx.conf /etc/nginx/"
+          ssh ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }} "sudo cp ~/temp_nginx_config/* /etc/nginx/sites-available/"
           
           # Create symbolic links for enabled sites (if they don't exist)
           ssh ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }} "for site in /etc/nginx/sites-available/*; do \
             site_name=\$(basename \$site); \
             if [ ! -L /etc/nginx/sites-enabled/\$site_name ]; then \
-              ln -sf /etc/nginx/sites-available/\$site_name /etc/nginx/sites-enabled/\$site_name; \
+              sudo ln -sf /etc/nginx/sites-available/\$site_name /etc/nginx/sites-enabled/\$site_name; \
             fi \
           done"
+          
+          # Clean up temporary directory
+          ssh ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }} "rm -rf ~/temp_nginx_config"
           
       - name: Test Nginx configuration and reload
         run: |
