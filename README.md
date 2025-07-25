@@ -63,6 +63,7 @@ If the deployment fails, check the following:
 - **"Permission denied" errors**: The VPS user doesn't have sudo access or the file permissions are too restrictive.
 - **"a terminal is required to read the password"**: This occurs when sudo requires a password but can't prompt for it in a non-interactive session. The workflow now uses `echo '${{ secrets.VPS_USER_PASSWORD }}' | sudo -S` to provide the password via standard input.
 - **"a password is required"**: The sudo password is incorrect or not provided. Verify that the VPS_USER_PASSWORD secret is set correctly in GitHub.
+- **"user directive is not allowed here in /etc/nginx/sites-enabled/nginx.conf"**: This error occurs when the main nginx.conf file (which contains the "user" directive) is incorrectly symlinked into the sites-enabled directory. The workflow now uses separate directories for the main configuration and site configurations to prevent this issue.
 
 ## Security Considerations
 
