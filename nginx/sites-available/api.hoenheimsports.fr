@@ -22,8 +22,8 @@ server {
     access_log /var/log/nginx/api.hoenheimsports.fr-https-access.log;
     error_log /var/log/nginx/api.hoenheimsports.fr-https-error.log;
 
-    ssl_certificate /etc/letsencrypt/live/hoenheimsports.fr/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/hoenheimsports.fr/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/api.hoenheimsports.fr/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/api.hoenheimsports.fr/privkey.pem;
 
     add_header X-Content-Type-Options "nosniff" always;
     add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
