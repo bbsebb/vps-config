@@ -19,7 +19,7 @@ jobs:
 
       - name: Create .env file
         run: |
-          cat > deployment/.env << EOF
+          cat > keycloak/.env << EOF
           # Database Credentials
           POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
           POSTGRES_USER=${{ vars.POSTGRES_USER }}
@@ -44,8 +44,8 @@ jobs:
 
       - name: Copy configuration files to VPS
         run: |
-          scp -o StrictHostKeyChecking=no deployment/.env ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }}:/home/${{ vars.VPS_USERNAME }}/keycloak/
-          scp -o StrictHostKeyChecking=no deployment/docker-compose.yml ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }}:/home/${{ vars.VPS_USERNAME }}/keycloak/
+          scp -o StrictHostKeyChecking=no keycloak/.env ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }}:/home/${{ vars.VPS_USERNAME }}/keycloak/
+          scp -o StrictHostKeyChecking=no keycloak/docker-compose.yml ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }}:/home/${{ vars.VPS_USERNAME }}/keycloak/
 
       - name: Deploy to VPS
         run: |
