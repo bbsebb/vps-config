@@ -39,6 +39,9 @@ jobs:
       - name: Prepare directory on VPS
         run: |
           ssh -o StrictHostKeyChecking=no ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }} "mkdir -p /home/${{ vars.VPS_USERNAME }}/observability"
+          ssh -o StrictHostKeyChecking=no ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }} "mkdir -p /home/${{ vars.VPS_USERNAME }}/observability/prometheus"
+          ssh -o StrictHostKeyChecking=no ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }} "mkdir -p /home/${{ vars.VPS_USERNAME }}/observability/tempo"
+          ssh -o StrictHostKeyChecking=no ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }} "mkdir -p /home/${{ vars.VPS_USERNAME }}/observability/grafana/datasources"
 
       - name: Copy configuration files to VPS
         run: |
