@@ -5,6 +5,7 @@ on:
       - vps
     paths:
       - 'keycloak/**'
+      - '.github/workflows/deploy-keycloak-to-vps.yml'
 
 
 jobs:
