@@ -5,6 +5,7 @@ on:
       - vps
     paths:
       - 'observability/**'
+      - '.github/workflows/deploy-observability-to-vps.yml'
 
 
 jobs:
