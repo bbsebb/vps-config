@@ -1,9 +1,11 @@
-name: Deploy to VPS
+name: Deploy NGINX to VPS
 
 on:
   push:
     branches:
       - vps  # or master, depending on your default branch name
+    paths:
+      - 'nginx/**'
 
 jobs:
   deploy:

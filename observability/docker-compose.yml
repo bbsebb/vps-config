@@ -1,0 +1,100 @@
+
+services:
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    networks:
+      - observability-network
+      - observability-net
+    healthcheck:
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9090/-/healthy" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  tempo:
+    image: grafana/tempo
+    container_name: tempo
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    volumes:
+      - tempo_data:/var/tempo
+      - ./tempo/tempo.yml:/etc/tempo.yaml:ro
+    ports:
+      - "3200:3200"  # Tempo
+      - "9411:9411"  # Zipkin
+    networks:
+      - observability-network
+      - observability-net
+    healthcheck:
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3200/status" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  loki:
+    image: grafana/loki:main
+    container_name: loki
+    command: [ "-config.file=/etc/loki/local-config.yaml" ]
+    ports:
+      - "3100:3100"
+    volumes:
+      - loki_data:/loki
+    networks:
+      - observability-network
+      - observability-net
+    healthcheck:
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3100/ready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources:ro
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
+    networks:
+      - observability-network
+      - observability-net
+    healthcheck:
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+    depends_on:
+      prometheus:
+        condition: service_healthy
+      tempo:
+        condition: service_healthy
+      loki:
+        condition: service_healthy
+
+networks:
+  observability-network:
+    driver: bridge
+  observability-net:
+    external: true
+
+
+volumes:
+  prometheus_data:
+  tempo_data:
+  loki_data:
+  grafana_data:
