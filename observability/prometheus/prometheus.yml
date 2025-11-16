@@ -1,0 +1,20 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: [ 'localhost:9090' ]
+
+  - job_name: 'spring-boot-apps'
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 5s
+    static_configs:
+      - targets: [ 'gateway-service:8080', 'contact-service:8080', 'training-service:8080', 'facebook-service:8080' ]
+      
+  - job_name: 'nginx'
+    scrape_interval: 5s
+    static_configs:
+      - targets: [ 'nginx-exporter:9113' ]
+    metrics_path: '/metrics'
