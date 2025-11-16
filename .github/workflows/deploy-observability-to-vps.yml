@@ -44,6 +44,9 @@ jobs:
         run: |
           scp -o StrictHostKeyChecking=no observability/.env ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }}:/home/${{ vars.VPS_USERNAME }}/observability/
           scp -o StrictHostKeyChecking=no observability/docker-compose.yml ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }}:/home/${{ vars.VPS_USERNAME }}/observability/
+          scp -o StrictHostKeyChecking=no observability/tempo/tempo.yml ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }}:/home/${{ vars.VPS_USERNAME }}/ashs/observability/tempo/tempo.yml
+          scp -o StrictHostKeyChecking=no observability/prometheus/prometheus.yml ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }}:/home/${{ vars.VPS_USERNAME }}/ashs/observability/prometheus/
+          scp -o StrictHostKeyChecking=no observability/grafana/datasources/datasources.yml ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }}:/home/${{ vars.VPS_USERNAME }}/ashs/observability/grafana/datasources/
 
       - name: Deploy to VPS
         run: |
