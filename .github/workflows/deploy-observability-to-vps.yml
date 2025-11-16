@@ -1,4 +1,5 @@
 name: deploy-observability-to-vps.yml
+
 on:
   push:
     branches:
@@ -6,7 +7,6 @@ on:
     paths:
       - 'observability/**'
       - '.github/workflows/deploy-observability-to-vps.yml'
-
 
 jobs:
   deploy-to-production:

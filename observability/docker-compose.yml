@@ -11,7 +11,6 @@ services:
       - prometheus_data:/prometheus
     networks:
       - observability-network
-      - observability-net
     healthcheck:
       test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9090/-/healthy" ]
       interval: 10s
@@ -31,7 +30,6 @@ services:
       - "9411:9411"  # Zipkin
     networks:
       - observability-network
-      - observability-net
     healthcheck:
       test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3200/status" ]
       interval: 10s
@@ -49,7 +47,6 @@ services:
       - loki_data:/loki
     networks:
       - observability-network
-      - observability-net
     healthcheck:
       test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3100/ready" ]
       interval: 10s
@@ -71,7 +68,6 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
     networks:
       - observability-network
-      - observability-net
     healthcheck:
       test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health" ]
       interval: 10s
@@ -89,8 +85,8 @@ services:
 networks:
   observability-network:
     driver: bridge
-  observability-net:
-    external: true
+    name: observability-network
+
 
 
 volumes:
