@@ -28,8 +28,6 @@ jobs:
           ssh-keyscan -H ${{ vars.VPS_HOST }} >> ~/.ssh/known_hosts
           
       - name: Deploy configuration to VPS
-        env:
-          VPS_USER_PASSWORD: ${{ secrets.VPS_USER_PASSWORD }}
         run: |
           echo "Deploying configuration to VPS..."
           
@@ -41,9 +39,9 @@ jobs:
           scp -r nginx/sites-available/* ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }}:~/temp_nginx_config/sites/
           
           # Use sudo to create directories and move files to their final locations
-          ssh ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }} "echo \"$VPS_USER_PASSWORD\" | sudo -S mkdir -p /etc/nginx/sites-available /etc/nginx/sites-enabled"
-          ssh ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }} "echo \"$VPS_USER_PASSWORD\" | sudo -S cp ~/temp_nginx_config/nginx.conf /etc/nginx/"
-          ssh ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }} "echo \"$VPS_USER_PASSWORD\" | sudo -S cp ~/temp_nginx_config/sites/* /etc/nginx/sites-available/"
+          ssh ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }} "echo \"${{ secrets.VPS_USER_PASSWORD }}\" | sudo -S mkdir -p /etc/nginx/sites-available /etc/nginx/sites-enabled"
+          ssh ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }} "echo \"${{ secrets.VPS_USER_PASSWORD }}\" | sudo -S cp ~/temp_nginx_config/nginx.conf /etc/nginx/"
+          ssh ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }} "echo \"${{ secrets.VPS_USER_PASSWORD }}\" | sudo -S cp ~/temp_nginx_config/sites/* /etc/nginx/sites-available/"
           
           # Create symbolic links for enabled sites (if they don't exist)
           ssh ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }} "for site in /etc/nginx/sites-available/*; do \
@@ -57,8 +55,6 @@ jobs:
           ssh ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }} "rm -rf ~/temp_nginx_config"
           
       - name: Test Nginx configuration and reload
-        env:
-          VPS_USER_PASSWORD: ${{ secrets.VPS_USER_PASSWORD }}
         run: |
           echo "Testing Nginx configuration..."
           ssh ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }} "echo \"${{ secrets.VPS_USER_PASSWORD }}\" | sudo -S nginx -t && echo \"${{ secrets.VPS_USER_PASSWORD }}\" | sudo -S systemctl reload nginx"
