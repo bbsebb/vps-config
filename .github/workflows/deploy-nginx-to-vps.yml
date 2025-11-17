@@ -57,7 +57,9 @@ jobs:
           ssh ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }} "rm -rf ~/temp_nginx_config"
           
       - name: Test Nginx configuration and reload
+        env:
+          VPS_USER_PASSWORD: ${{ secrets.VPS_USER_PASSWORD }}
         run: |
           echo "Testing Nginx configuration..."
-          ssh ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }} "echo '${{ secrets.VPS_USER_PASSWORD }}' | sudo -S nginx -t && echo '${{ secrets.VPS_USER_PASSWORD }}' | sudo -S systemctl reload nginx"
+          ssh ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }} "echo \"$VPS_USER_PASSWORD\" | sudo -S nginx -t && echo '${{ secrets.VPS_USER_PASSWORD }}' | sudo -S systemctl reload nginx"
           echo "Configuration deployed and Nginx reloaded successfully!"
