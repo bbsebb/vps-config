@@ -6,6 +6,7 @@ on:
       - vps  # or master, depending on your default branch name
     paths:
       - 'nginx/**'
+      - '.github/workflows/deploy-nginx-to-vps.yml'
 
 jobs:
   deploy:
