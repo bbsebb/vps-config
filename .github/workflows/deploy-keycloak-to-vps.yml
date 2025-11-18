@@ -1,6 +1,7 @@
 name: deploy-keycloak-to-vps.yml
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - vps
