@@ -1,6 +1,7 @@
 name: deploy-observability-to-vps.yml
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - vps
