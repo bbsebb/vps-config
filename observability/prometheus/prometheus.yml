@@ -18,3 +18,8 @@ scrape_configs:
     static_configs:
       - targets: [ 'nginx-exporter:9113' ]
     metrics_path: '/metrics'
+
+  - job_name: 'alumni-spring-boot-app'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'alumni-ashs-backend:8080' ]
