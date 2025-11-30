@@ -47,7 +47,7 @@ jobs:
           ssh ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }} "for site in /etc/nginx/sites-available/*; do \
             site_name=\$(basename \"\$site\"); \
             if [ ! -L \"/etc/nginx/sites-enabled/\$site_name\" ]; then \
-              echo \"$VPS_USER_PASSWORD\" | sudo -S ln -sf \"/etc/nginx/sites-available/\$site_name\" \"/etc/nginx/sites-enabled/\$site_name\"; \
+              echo \"${{ secrets.VPS_USER_PASSWORD }}\" | sudo -S ln -sf \"/etc/nginx/sites-available/\$site_name\" \"/etc/nginx/sites-enabled/\$site_name\"; \
             fi \
           done"
           
