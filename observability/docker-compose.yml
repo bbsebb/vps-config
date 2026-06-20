@@ -4,6 +4,11 @@ services:
     image: prom/prometheus
     container_name: prometheus
     restart: unless-stopped
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.enable-remote-write-receiver
+      - --enable-feature=exemplar-storage
     ports:
       - "9090:9090"
     volumes:
@@ -82,6 +87,26 @@ services:
         condition: service_started
       loki:
         condition: service_healthy
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.154.0
+    container_name: otel-collector
+    restart: unless-stopped
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./otel-config.yaml:/etc/otel-collector-config.yaml:ro
+    ports:
+      - "4317:4317" # OTLP gRPC
+      - "4318:4318" # OTLP HTTP
+    networks:
+      - observability-network
+    depends_on:
+      prometheus:
+        condition: service_healthy
+      loki:
+        condition: service_healthy
+      tempo:
+        condition: service_started
 
 networks:
   observability-network:
