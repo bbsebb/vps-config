@@ -18,4 +18,3 @@ scrape_configs:
     static_configs:
       - targets: [ 'nginx-exporter:9113' ]
     metrics_path: '/metrics'
-
