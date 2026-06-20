@@ -67,6 +67,11 @@ while [ $attempt -le $max_attempts ]; do
 done
 
 if [ "$all_healthy" = "true" ]; then
+    if docker compose -f "$COMPOSE_FILE" logs otel-collector | grep -i "deprecated" > /dev/null; then
+        echo "=== FAILURE: Deprecation warnings found in otel-collector logs! ==="
+        docker compose -f "$COMPOSE_FILE" logs otel-collector
+        exit 1
+    fi
     echo "=== SUCCESS: All services are healthy and responding! ==="
     exit 0
 else
