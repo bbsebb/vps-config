@@ -3,8 +3,10 @@ server:
 
 distributor:
   receivers:
-    zipkin:
-      endpoint: 0.0.0.0:9411
+    otlp:
+      protocols:
+        grpc:
+        http:
 
 storage:
   trace:

@@ -47,6 +47,7 @@ jobs:
       - name: Copy configuration files to VPS
         run: |
           scp -o StrictHostKeyChecking=no observability/.env ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }}:/home/${{ vars.VPS_USERNAME }}/observability/
+          scp -o StrictHostKeyChecking=no observability/otel-config.yaml ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }}:/home/${{ vars.VPS_USERNAME }}/observability/
           scp -o StrictHostKeyChecking=no observability/docker-compose.yml ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }}:/home/${{ vars.VPS_USERNAME }}/observability/
           scp -o StrictHostKeyChecking=no -r observability/prometheus ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }}:/home/${{ vars.VPS_USERNAME }}/observability/
           scp -o StrictHostKeyChecking=no -r observability/tempo ${{ vars.VPS_USERNAME }}@${{ vars.VPS_HOST }}:/home/${{ vars.VPS_USERNAME }}/observability/
