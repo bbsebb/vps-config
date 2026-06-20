@@ -53,12 +53,7 @@ services:
       - loki_data:/loki
     networks:
       - observability-network
-    healthcheck:
-      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3100/ready" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 40s
+    # health check supprimé, car l'image ne contient ni sh, ni wget, ni curl
 
   grafana:
     image: grafana/grafana:latest
@@ -86,7 +81,7 @@ services:
       tempo:
         condition: service_started
       loki:
-        condition: service_healthy
+        condition: service_started
 
   otel-collector:
     image: otel/opentelemetry-collector-contrib:latest
@@ -104,7 +99,7 @@ services:
       prometheus:
         condition: service_healthy
       loki:
-        condition: service_healthy
+        condition: service_started
       tempo:
         condition: service_started
 
