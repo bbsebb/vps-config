@@ -72,6 +72,70 @@ if [ "$all_healthy" = "true" ]; then
         docker compose -f "$COMPOSE_FILE" logs otel-collector
         exit 1
     fi
+
+    echo "=== Testing log propagation to Loki ==="
+    current_time_ns=$(date +%s000000000)
+    json_payload=$(cat <<EOF
+{
+  "resourceLogs": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "test-service"
+            }
+          }
+        ]
+      },
+      "scopeLogs": [
+        {
+          "logRecords": [
+            {
+              "timeUnixNano": "${current_time_ns}",
+              "body": {
+                "stringValue": "This is a test log message from Antigravity!"
+              },
+              "attributes": [
+                {
+                  "key": "log.type",
+                  "value": {
+                    "stringValue": "test"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+EOF
+)
+
+    echo "Sending test log to otel-collector OTLP HTTP endpoint..."
+    curl -s -X POST -H "Content-Type: application/json" -d "$json_payload" http://localhost:4318/v1/logs
+
+    echo "Waiting for log to propagate..."
+    sleep 6
+
+    echo "Querying Loki..."
+    loki_response=$(curl -s -G "http://localhost:3100/loki/api/v1/query_range" --data-urlencode 'query={service_name="test-service"}')
+    echo "Loki response: $loki_response"
+
+    if echo "$loki_response" | grep -F "This is a test log message from Antigravity!" > /dev/null; then
+        echo "=== SUCCESS: Log successfully ingested and queried from Loki! ==="
+    else
+        echo "=== FAILURE: Log propagation failed! ==="
+        echo "otel-collector logs:"
+        docker compose -f "$COMPOSE_FILE" logs otel-collector
+        echo "Loki logs:"
+        docker compose -f "$COMPOSE_FILE" logs loki
+        exit 1
+    fi
+
     echo "=== SUCCESS: All services are healthy and responding! ==="
     exit 0
 else
